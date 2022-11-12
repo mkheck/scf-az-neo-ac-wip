@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.7.5</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.thehecklers</groupId>
+	<artifactId>aircraft-fn</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>aircraft-fn</name>
+	<description>Aircraft function for getting functional</description>
+	<properties>
+		<java.version>17</java.version>
+		<spring-cloud.version>2021.0.4</spring-cloud.version>
+
+		<!--	MH: Added	-->
+		<azure.functions.java.library.version>2.2.0</azure.functions.java.library.version>
+		<azure.functions.maven.plugin.version>1.21.0</azure.functions.maven.plugin.version>
+
+		<!-- customize those two properties. The functionAppName should be unique across Azure -->
+		<functionResourceGroup>mkheck-spring-function-resource-group</functionResourceGroup>
+		<functionAppName>aircraft-fn</functionAppName>
+
+		<functionAppRegion>eastus</functionAppRegion>
+		<stagingDirectory>${project.build.directory}/azure-functions/${functionAppName}</stagingDirectory>
+		<start-class>com.thehecklers.aircraftfn.AircraftFnApplication</start-class>
+	</properties>
+	<dependencies>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter</artifactId>-->
+<!--		</dependency>-->
+
+		<!--		MH: Is this necessary or helpful now? Had commented it out running locally, works fine		-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-function-context</artifactId>-->
+<!--		</dependency>-->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-neo4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-function-webflux</artifactId>
+		</dependency>
+
+		<!--	MH: Added	-->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-function-adapter-azure</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!--	MH: Added	-->
+			<dependency>
+				<groupId>com.microsoft.azure.functions</groupId>
+				<artifactId>azure-functions-java-library</artifactId>
+				<version>${azure.functions.java.library.version}</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+
+		<!--	MH: Added entire pluginManagement section for AzFns		-->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.microsoft.azure</groupId>
+					<artifactId>azure-functions-maven-plugin</artifactId>
+					<version>${azure.functions.maven.plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.3.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.3.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+
+			<!--	MH: Added entire freaking section of plugins for AzFns. IS ALL OF THIS NECESSARY???		-->
+			<plugin>
+				<groupId>com.microsoft.azure</groupId>
+				<artifactId>azure-functions-maven-plugin</artifactId>
+				<configuration>
+					<resourceGroup>${functionResourceGroup}</resourceGroup>
+					<appName>${functionAppName}</appName>
+					<region>${functionAppRegion}</region>
+					<runtime>
+						<os>linux</os>
+						<javaVersion>17</javaVersion>
+					</runtime>
+					<appSettings>
+						<!-- Run Azure Function from package file by default -->
+						<property>
+							<name>FUNCTIONS_EXTENSION_VERSION</name>
+							<value>~4</value>
+						</property>
+						<property>
+							<name>FUNCTIONS_WORKER_RUNTIME</name>
+							<value>java</value>
+						</property>
+					</appSettings>
+				</configuration>
+				<executions>
+					<execution>
+						<id>package-functions</id>
+						<goals>
+							<goal>package</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<overwrite>true</overwrite>
+							<outputDirectory>
+								${project.build.directory}/azure-functions/${functionAppName}
+							</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/src/main/azure
+									</directory>
+									<includes>
+										<include>**</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${stagingDirectory}/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<includeScope>runtime</includeScope>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!--Remove obj folder generated by .NET SDK in maven clean-->
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>obj</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
