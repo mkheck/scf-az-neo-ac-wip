@@ -17,7 +17,7 @@ public class AircraftHandler extends FunctionInvoker<Aircraft, Aircraft> {
                     HttpRequestMessage<Optional<Aircraft>> request,
             ExecutionContext context) {
         Aircraft aircraft = request.getBody()
-//                .filter(a -> a.getAdshex() != null)
+                .filter(a -> a.getAdshex() != null)
                 .orElseGet(() -> new Aircraft("010101", "987654", "UNK"));
         context.getLogger().info("Aircraft ID is " + aircraft.getAdshex());
         return request

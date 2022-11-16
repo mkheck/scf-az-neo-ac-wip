@@ -3,6 +3,8 @@ package com.thehecklers.aircraftfn;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.function.Function;
+
 @SpringBootApplication
 public class AircraftFnApplication {
 
@@ -10,7 +12,6 @@ public class AircraftFnApplication {
 		SpringApplication.run(AircraftFnApplication.class, args);
 	}
 
-//	@Bean
 //	public Function<Aircraft, Aircraft> aircraftFunction() {
 //		return a -> {
 //			System.out.println(a);

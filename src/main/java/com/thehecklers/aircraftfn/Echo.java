@@ -14,7 +14,6 @@ public class Echo implements Function<Aircraft, Aircraft> {
 
     public Aircraft apply(Aircraft ac) {
         System.out.println(ac);
-        //return ac.getAdshex();
         return repo.save(ac);
     }
 }

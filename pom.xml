@@ -34,18 +34,14 @@
 <!--			<groupId>org.springframework.boot</groupId>-->
 <!--			<artifactId>spring-boot-starter</artifactId>-->
 <!--		</dependency>-->
-
-		<!--		MH: Is this necessary or helpful now? Had commented it out running locally, works fine		-->
 <!--		<dependency>-->
 <!--			<groupId>org.springframework.cloud</groupId>-->
 <!--			<artifactId>spring-cloud-function-context</artifactId>-->
 <!--		</dependency>-->
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-neo4j</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-function-webflux</artifactId>
@@ -85,7 +81,7 @@
 
 	<build>
 
-		<!--	MH: Added entire pluginManagement section for AzFns		-->
+		<!--	MH: Added entire pluginManagement section for Azure Functions		-->
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -112,7 +108,7 @@
 
 		<plugins>
 
-			<!--	MH: Added entire freaking section of plugins for AzFns. IS ALL OF THIS NECESSARY???		-->
+			<!--	MH: Added entire section of plugins for Azure Functions		-->
 			<plugin>
 				<groupId>com.microsoft.azure</groupId>
 				<artifactId>azure-functions-maven-plugin</artifactId>
